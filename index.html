@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>(random (...))</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="(random (...))">
+<meta property="og:url" content="https://iasenim.github.io/index.html">
+<meta property="og:site_name" content="(random (...))">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(random (...))">
+  
+    <link rel="alternate" href="/atom.xml" title="(random (...))" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-82815912-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">(random (...))</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://iasenim.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Types-in-OCaml-and-Sets-in-Probability" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/08/14/Types-in-OCaml-and-Sets-in-Probability/" class="article-date">
+  <time datetime="2016-08-15T03:31:00.000Z" itemprop="datePublished">2016-08-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/08/14/Types-in-OCaml-and-Sets-in-Probability/">Types in OCaml and Sets in Probability</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Recently I decided to pick up probability theory again. This is a subject that always puzzles me.  One thing I noticed is that sometimes the notations used in probability theory can be quite misleading. In contrast, a programming language is meant to be precise on what it says. So can we express concepts in probability theory using some programming language constructs so that one can understand them better? This post is such an attempt.  </p>
+<p>Modern probability theory is based on the concept of <em>Set</em>s. A probability space consists a set $\Omega$, a probability function $P$ that maps a subset (<em>event</em>) of $\Omega$ to a real number.  (To be complete, it also includes a $\sigma$-algebra of subsets of $\Omega$ which I will not talk about.) The probability function $P$ satisfies two properties: </p>
+<ol>
+<li>$P(\emptyset) = 0, P(\Omega) = 1$</li>
+<li>If $A_1, A_2, \dots$ satisfy $A_i\cap A_j = \emptyset$ when $i \ne j$, we have<br>$$P(\cup A_i) = \sum P(A_i)$$</li>
+</ol>
+<p>As in any complex system, we have (see <a href="https://mitpress.mit.edu/sicp/" target="_blank" rel="external">SICP</a> for an excellent introduction)</p>
+<ul>
+<li>Some primitive building blocks, e.g., elements of a set. </li>
+<li>Ways of combining primitive building block to form more complex object, e.g., forming of <em>subset</em>s, and union and intersection of sets</li>
+</ul>
+<p>It is thus very important to understand to how to combine events to form new events. However, I found that the  operator $\cap$ is often so heavily overloaded that its usage can be quite confusing. In set theory, $A\cap B$ means a new subset where  $x \in A$ and $x \in B$ must both be true for any element $x$ of it. But in probability theory, it means both event $A$ and event $B$ occur in an experiment. This can mean the same thing as in set theory. But it can also mean quite different thing, namely a <em>Cartesian product</em> formed from two different sets, e.g., the definition of independency of events: $P(A\cap B) = P(A)P(B)$. If you think of $\cap$ as intersection of $A$ and $B$, this will never happen.</p>
+<h2 id="Tossing-dice"><a href="#Tossing-dice" class="headerlink" title="Tossing dice"></a>Tossing dice</h2><p>We can use types in OCaml to experiment and clarify these concepts. Let’s use dice as an example. We can define dice as follows,<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> <span class="symbol">'a</span> toss =</div><div class="line">  | <span class="type">One</span>   <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line">  | <span class="type">Two</span>   <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line">  | <span class="type">Three</span> <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line">  | <span class="type">Four</span>  <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line">  | <span class="type">Five</span>  <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line">  | <span class="type">Six</span>   <span class="keyword">of</span> <span class="symbol">'a</span></div><div class="line"></div><div class="line"><span class="keyword">type</span> fair_dice   = <span class="type">Fair_dice</span></div><div class="line"><span class="keyword">type</span> biased_dice = <span class="type">Biased_dice</span></div></pre></td></tr></table></figure></p>
+<p>To be more general, let’s assume there are two types of dice, namely, fair dice and biased dice. For any dice, there are 6 outcomes of tossing it. These 6 outcomes are the primitive elements of the probability space. We can represent such an element as <code>Five(Biased_dice)</code>, which means that we toss the fair dice and get a <code>Five</code>. If we type it in the REPL, we have</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> five = <span class="type">Five</span>(<span class="type">Biased_dice</span>);;</div><div class="line"><span class="comment">(* val five : biased_dice toss = Five Biased_dice *)</span></div></pre></td></tr></table></figure>
+<p>Note the type of <code>five</code> is <code>biased_dice toss</code>. How nice it is! Now following the definition of probability space, we need to define a function that assign a number to each set element.</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> prob_fair_elem x =</div><div class="line">  <span class="keyword">match</span> x <span class="keyword">with</span></div><div class="line">  | <span class="type">One</span>(<span class="type">Fair_dice</span>) -&gt; <span class="number">1.0</span> /. <span class="number">6.0</span></div><div class="line">  | _              -&gt; <span class="number">1.0</span> /. <span class="number">6.0</span></div><div class="line"></div><div class="line"><span class="keyword">let</span> prob_biased_elem x =</div><div class="line">  <span class="keyword">match</span> x <span class="keyword">with</span></div><div class="line">  | <span class="type">One</span>(<span class="type">Biased_dice</span>)   -&gt; <span class="number">1.0</span> /. <span class="number">12.0</span></div><div class="line">  | <span class="type">Two</span>(<span class="type">Biased_dice</span>)   -&gt; <span class="number">2.0</span> /. <span class="number">12.0</span></div><div class="line">  | <span class="type">Three</span>(<span class="type">Biased_dice</span>) -&gt; <span class="number">3.0</span> /. <span class="number">12.0</span></div><div class="line">  | <span class="type">Four</span>(<span class="type">Biased_dice</span>)  -&gt; <span class="number">1.0</span> /. <span class="number">12.0</span></div><div class="line">  | <span class="type">Five</span>(<span class="type">Biased_dice</span>)  -&gt; <span class="number">1.0</span> /. <span class="number">12.0</span></div><div class="line">  | <span class="type">Six</span>(<span class="type">Biased_dice</span>)   -&gt; <span class="number">4.0</span> /. <span class="number">12.0</span></div></pre></td></tr></table></figure>
+<p>Given the above definitions, we can now form various events. </p>
+<h3 id="Sum-event"><a href="#Sum-event" class="headerlink" title="Sum-event"></a><em>Sum</em>-event</h3><p>I call an event a <em>sum</em>-event when it is a subset of the probability space $\Omega$ which is <em>the</em> set containing all the primitive elements. For example, consider the event when tossing a biased dice, the outcome is either 3, 5, or 6. Let’s call this event <code>a</code>. For simplicity, we can use list to represent a set:<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> a = [<span class="type">Three</span>(<span class="type">Biased_dice</span>); <span class="type">Five</span>(<span class="type">Biased_dice</span>); <span class="type">Six</span>(<span class="type">Biased_dice</span>)]</div></pre></td></tr></table></figure></p>
+<p>The probability space itself can be represented as:<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> omega_biased = [<span class="type">One</span>(<span class="type">Biased_dice</span>); <span class="type">Two</span>(<span class="type">Biased_dice</span>); <span class="type">Three</span>(<span class="type">Biased_dice</span>); <span class="type">Four</span>(<span class="type">Biased_dice</span>); <span class="type">Five</span>(<span class="type">Biased_dice</span>); <span class="type">Six</span>(<span class="type">Biased_dice</span>)]</div></pre></td></tr></table></figure></p>
+<p>Using a plain list to represent a set, we have to be careful not to have duplicate entries, and it does not support union and intersection operations automatically. A better way is to use a proper set library such as Core.Set.  </p>
+<p>Now we can define the probability function for the probability space of dice tossing.<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> prob_fair event =</div><div class="line">  <span class="type">List</span>.fold ~f:(<span class="keyword">fun</span> x y -&gt; x +. prob_fair_elem y) ~init:<span class="number">0.0</span> event</div><div class="line"></div><div class="line"><span class="keyword">let</span> prob_biased event =</div><div class="line">  <span class="type">List</span>.fold ~f:(<span class="keyword">fun</span> x y -&gt; x +. prob_biased_elem y) ~init:<span class="number">0.0</span> event</div></pre></td></tr></table></figure></p>
+<p>The above two functions simply <strong>sum</strong> the probabilities of each of the elements in an event. For example, for event <code>a</code>, its probability is<br><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(prob_biased_elem <span class="type">Three</span>(<span class="type">Biased_dice</span>)) +. (prob_biased_elem <span class="type">Five</span>(<span class="type">Biased_dice</span>)) +. (prob_biased_elem <span class="type">Six</span>(<span class="type">Biased_dice</span>))</div></pre></td></tr></table></figure></p>
+<p>It can be verified that they satisfy the two requirement for $P$. In programming language theory, the types <code>toss</code> and <code>fair_dice</code> are called <em>sum type</em>s.  </p>
+<p>Come back to the $\cap$ operator, for <em>sum</em>-events, $\cap$ means intersection, this is because the result of tossing a dice can only have one value. Two events can both happen only when they share some common elements. <strong><em>Sum</em>- events can not be independent</strong>, since occurrence of one value means other values are excluded.</p>
+<h3 id="Product-event"><a href="#Product-event" class="headerlink" title="Product-event"></a><em>Product</em>-event</h3><p>Suppose we wish to study the probability of tossing both a fair dice and a biased dice. For example, we can ask what is the probability that fair dice has value 3 and biased dice has value 6. Starting again from the definition of probability space, we can first ask what the primitive elements are. Clearly we can use an ordered pair $(x, y)$ to record the outcomes, where $x$ is the result of tossing the fair dice, $y$ is the result of biased dice. Since each of the dice has six faces, there are $6\times 6 = 36$ such ordered pairs. Next we can ask what probability we shall assign to each such pair. The answer is the product of the probabilities of each dice. The reason is that among all the outcomes, there are $P(x)$ of chance to get $x$ for the fair dice, and among the all the outcomes of tossing the two dice with the fair dice having a value $x$, the probability is $P(y)$. This is essentially the <em>multiplication rule</em> for counting outcomes of an experiment. So new treating these ordered pair as building blocks, we can proceed to construct probability function and events. </p>
+<p>In OCaml, such an ordered pair can be nicely represented as a tuple, e.g., <code>(Three(Fair_dice), Six(Biased_dice))</code>. Because these new building blocks have much richer internal structures, they have more interesting properties. A general event in these two-dice space looks like <code>[(Five(Fair_dice), Four(Biased_dice)); (One(Fair_dice), Six(Biased_dice))]</code>, which is simply a set (list) of ordered pairs. However, if examine them closely, it is easy to see that we can at least classify them into two classes of sets.</p>
+<ul>
+<li><strong>Events for the fair and biased dice are independent</strong><br>For this class of events, we can always represent them as a product of the event by tossing fair dice and that of the biased dice. One example:<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> two_dice_event = ([<span class="type">Two</span>(<span class="type">Fair_dice</span>); <span class="type">Three</span>(<span class="type">Fair_dice</span>)], [<span class="type">One</span>(<span class="type">Biased_dice</span>); <span class="type">Five</span>(<span class="type">Biased_dice</span>); <span class="type">Six</span>(<span class="type">Biased_dice</span>)])</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>OCaml will report the type of it is <code>val two_dice_event : fair_dice toss list * biased_dice toss list</code>. This is an example of <em>product type</em>. As for <em>sum</em>-event, we can call such an event <em>product</em>-event. Consider again $\cap$ operator, if we have an event $A$ for fair dice, and an event $B$ for biased dice, the event $A\cap B$ actually means forming a <em>product</em>-event, and we have $P(A\cap B) = P(A)P(B)$, meaning $A$ and $B$ are independent events.</p>
+<ul>
+<li><p><strong>There is a relation or constraint between the events of fair and biased dice</strong><br>For example, the event where the sum of the face values when tossing the two dice is 5:</p>
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> sum_five = [(<span class="type">Two</span>(<span class="type">Fair_dice</span>), <span class="type">Three</span>(<span class="type">Biased_dice</span>)); (<span class="type">Three</span>(<span class="type">Fair_dice</span>), <span class="type">Two</span>(<span class="type">Biased_dice</span>)); (<span class="type">One</span>(<span class="type">Fair_dice</span>), <span class="type">Four</span>(<span class="type">Biased_dice</span>)); (<span class="type">Four</span>(<span class="type">Fair_dice</span>), <span class="type">One</span>(<span class="type">Biased_dice</span>)]</div></pre></td></tr></table></figure>
+<p>Such an event cannot represented as a product of fair dice event and biased dice event, it is a sum-event with a constraint. </p>
+</li>
+</ul>
+<hr>
+<p>After I used computer programs to solve probability problems, I used to implicitly use these concepts without realizing them. Programming using a good typed language forced me to think more clearly. And doing so actually helped me to understand both probability and programming better. </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://iasenim.github.io/2016/08/14/Types-in-OCaml-and-Sets-in-Probability/" data-id="cis1cj9im0000vf9v2laxatqg" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/08/14/Types-in-OCaml-and-Sets-in-Probability/">Types in OCaml and Sets in Probability</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 iasenim AT gmail.com<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
