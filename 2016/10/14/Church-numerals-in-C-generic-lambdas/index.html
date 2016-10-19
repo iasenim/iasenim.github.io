@@ -91,7 +91,7 @@
 <meta property="og:description" content="邱奇数(Church Numerals)是 $\lambda$ 演算中的一个著名例子。我们可以通过实现它来了解和练习使用C++14里的Generic Lambda。本文里的例子最新的C++编译器（VC2015, g++ 6, clang++ 3.8）都可以编译运行。
 什么是邱奇数？邱奇数是通过函数来表示自然数的方法。直观上讲，邱奇数可以类比于下图（图一）里表示数字的方法。假设我们有一个球，我们可以">
 <meta property="og:image" content="https://iasenim.github.io/images/box_numbers.png">
-<meta property="og:updated_time" content="2016-10-18T05:11:56.598Z">
+<meta property="og:updated_time" content="2016-10-19T04:40:03.529Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="邱奇数的C++实现">
 <meta name="twitter:description" content="邱奇数(Church Numerals)是 $\lambda$ 演算中的一个著名例子。我们可以通过实现它来了解和练习使用C++14里的Generic Lambda。本文里的例子最新的C++编译器（VC2015, g++ 6, clang++ 3.8）都可以编译运行。
@@ -309,7 +309,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">auto</span> one = [](<span class="keyword">auto</span> f) &#123; </div><div class="line">    <span class="keyword">return</span> [=](<span class="keyword">auto</span> x) &#123; </div><div class="line">        <span class="keyword">return</span> f(x);&#125;;&#125;;</div></pre></td></tr></table></figure>
 <p>⚠️这里 $f$ 必须是一个函数，因为在内部的lambda里我们把 $x$ 作为变量传给了 $f$。</p>
 <p>当然我们不可能像这样把每一个自然数都写出来，所以我们需要更加普遍的方法来构造邱奇数。最基本的一个操作就是给一个数加一：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">auto</span> add1 = [](<span class="keyword">auto</span> n) &#123; </div><div class="line">    <span class="keyword">return</span> [=](<span class="keyword">auto</span> f) &#123; </div><div class="line">        <span class="keyword">return</span> [=](<span class="keyword">auto</span> x) &#123; </div><div class="line">            <span class="keyword">return</span> f((n(f))(x));&#125;;&#125;;&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">auto</span> add1 = [](<span class="keyword">auto</span> n) &#123; </div><div class="line">    <span class="keyword">return</span> [=](<span class="keyword">auto</span> f) &#123; </div><div class="line">        <span class="keyword">return</span> [=](<span class="keyword">auto</span> x) &#123; </div><div class="line">            <span class="keyword">return</span> f(n(f)(x));&#125;;&#125;;&#125;;</div></pre></td></tr></table></figure>
 <p><code>add1</code>是一个典型的高阶函数。它接受一个邱奇数，返回一个新的邱奇数。在这里，我们把 $f$ 作用在 $n$ 上，根据邱奇数的定义，它表示 $n + 1$。有了这个函数，我们就可以从0开始不断的加一产生一系列的数。比如：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">auto</span> one = add1(zero);</div><div class="line"><span class="keyword">auto</span> two = add1(one);</div></pre></td></tr></table></figure>
 <p>从<code>add1</code>我们可以看出，给一个数加一，就是把 $f$ 作用在其上。很自然的，我们可以把两个数相加：</p>
